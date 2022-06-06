@@ -97,7 +97,7 @@ module.exports = {
   },
   paths: {
     sources: "./contracts",
-    tests: "./test/Mainnet Fork",
+    tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts"
   },
