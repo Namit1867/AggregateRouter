@@ -1,54 +1,64 @@
-// //SPDX-License-Identifier: UNLINCENSED
+//SPDX-License-Identifier: UNLINCENSED
 
-// pragma solidity ^0.8.0;
+pragma solidity ^0.8.0;
 
 
-// import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-// interface IPancakeRouter01{
-//     function swapExactTokensForTokens(
-//         uint amountIn,
-//         uint amountOutMin,
-//         address[] calldata path,
-//         address to,
-//         uint deadline
-//     ) external returns (uint[] memory amounts);
-// }
+interface IPancakeRouter01{
+    function swapExactTokensForTokens(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external returns (uint[] memory amounts);
 
-// contract DexAggregator is Ownable{
+    function getAmountsOut(
+        uint amountIn, 
+        address[] calldata path
+    ) external view returns (uint[] memory amounts);
+}
 
-//     mapping(address => bool) public whitelistedRouterAddress;
+contract DexAggregator is Ownable{
 
-//     struct SwapDescription {
-//         address routerAddress;
-//         address[] pathOfTokens;
-//         uint256 inputAmount;
-//         uint256 minOutputAmount;
-//     }
+    mapping(address => bool) public whitelistedRouterAddress;
 
-//     function addToWhiteListedRouterAddress(address _routerAddress) external onlyOwner{
-//         whitelistedRouterAddress[_routerAddress] = true;
-//     }
+    struct SwapDescription {
+        address routerAddress;
+        address[] pathOfTokens;
+        uint256 minOutputAmount;
+    }
 
-//     function removeFromWhiteListedRouterAddress(address _routerAddress) external onlyOwner{
-//         whitelistedRouterAddress[_routerAddress] = false;
-//     }
+    function addToWhiteListedRouterAddress(address _routerAddress) external onlyOwner{
+        whitelistedRouterAddress[_routerAddress] = true;
+    }
 
-//     function swap(SwapDescription[] memory desc) external returns (uint[] memory amounts){
-//         _prevalidateSwapParameters(desc[0]);
-//         (amounts) = IPancakeRouter01(desc.routerAddress).swapExactTokensForTokens(
-//             desc.inputAmount, 
-//             desc.minOutputAmount, 
-//             desc.pathOfTokens, 
-//             msg.sender, 
-//             block.timestamp+100
-//         );
-//     }
+    function removeFromWhiteListedRouterAddress(address _routerAddress) external onlyOwner{
+        whitelistedRouterAddress[_routerAddress] = false;
+    }
 
-//     function _prevalidateSwapParameters (SwapDescription calldata desc) internal view {
-//         require(whitelistedRouterAddress[desc.routerAddress], "Invalid Router Address");
-//         require(desc.pathOfTokens.length > 2, "Invalid Path length");
-//         require((desc.inputAmount > 0) && (desc.minOutputAmount > 0),"Invalid Amounts");
-//     }
+    function swap(SwapDescription[] calldata desc, uint256 inputAmount) external returns (uint[] memory amounts){
+        for(uint i = 0; i < desc.length; i++){
+            _prevalidateSwapParameters(desc[i]);
+            uint[] memory amountsOut = IPancakeRouter01(desc[i].routerAddress).getAmountsOut(inputAmount, desc[i].pathOfTokens);
+            (amounts) = IPancakeRouter01(desc[i].routerAddress).swapExactTokensForTokens(
+            inputAmount, 
+            amountsOut[1], 
+            desc[i].pathOfTokens, 
+            msg.sender, 
+            block.timestamp+100
+        );
+        inputAmount = amountsOut[1];
 
-// }
+        }
+        
+    }
+
+    function _prevalidateSwapParameters (SwapDescription calldata desc) internal view {
+        require(whitelistedRouterAddress[desc.routerAddress], "Invalid Router Address");
+        require(desc.pathOfTokens.length > 2, "Invalid Path length");
+        require(desc.minOutputAmount > 0,"Invalid Amounts");
+    }
+
+}

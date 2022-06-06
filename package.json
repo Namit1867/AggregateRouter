@@ -8,5 +8,25 @@
     "@openzeppelin/contracts": "^4.5.0",
     "@uniswap/lib": "^4.0.1-alpha",
     "dotenv": "^16.0.1"
-  }
+  },
+  "description": "- BNB\r - BUSD\r - BTCB\r - EXO",
+  "version": "1.0.0",
+  "main": "hardhat.config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/njrapidinnovation/AggregateRouter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/njrapidinnovation/AggregateRouter/issues"
+  },
+  "homepage": "https://github.com/njrapidinnovation/AggregateRouter#readme"
 }
