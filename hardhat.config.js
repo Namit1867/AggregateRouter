@@ -97,7 +97,7 @@ module.exports = {
   },
   paths: {
     sources: "./contracts",
-    tests: "./test",
+    tests: "./test/dex-aggregator",
     cache: "./cache",
     artifacts: "./artifacts"
   },
